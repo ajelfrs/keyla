@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="valentine">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buat Kamu ❤️</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.6.0/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Indie+Flower&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        .handwriting { font-family: 'Indie Flower', cursive; }
+        
+        /* Animasi Fade In */
+        .fade-in { animation: fadeIn 2s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Custom Animasi Loading Love */
+        @keyframes bounceHeart {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px) scale(1.1); }
+        }
+        .heart-dot {
+            display: inline-block;
+            animation: bounceHeart 0.6s infinite alternate;
+        }
+        .delay-1 { animation-delay: 0s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.4s; }
+
+        /* Amplop Styles */
+        .envelope-wrapper {
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .envelope-wrapper:hover {
+            transform: scale(1.05) rotate(2deg);
+        }
+
+        /* Cursor effect */
+        .typing-cursor::after {
+            content: '|';
+            animation: blink 1s infinite;
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* Custom Scrollbar untuk Modal biar cantik */
+        .custom-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+            border-radius: 10px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #fbcfe8; 
+            border-radius: 10px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: #f9a8d4; 
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-pink-100 to-purple-200 min-h-screen flex items-center justify-center overflow-hidden">
+
+    <div id="loading" class="fixed inset-0 bg-pink-50 z-50 flex flex-col items-center justify-center">
+        <div class="flex space-x-4 text-4xl text-red-500">
+            <span class="heart-dot delay-1">♥</span>
+            <span class="heart-dot delay-2">♥</span>
+            <span class="heart-dot delay-3">♥</span>
+        </div>
+        <p class="mt-6 text-lg font-semibold text-pink-600 animate-pulse tracking-widest">Tunggu Bentar Yaa...</p>
+    </div>
+
+    <div id="main-container" class="hidden w-full max-w-md p-4">
+        <div class="animate__animated animate__zoomIn card bg-white/90 backdrop-blur-sm shadow-2xl border-4 border-pink-300">
+            
+            <figure class="px-5 pt-5 min-h-[200px] flex items-center justify-center">
+                <img id="card-image" src="" alt="Cute Gif" class="rounded-xl h-48 object-cover shadow-md" />
+                
+                <div id="envelope-ui" class="hidden envelope-wrapper flex-col items-center" onclick="bukaSurat()">
+                    <div class="text-9xl animate-bounce"><img src="gif/turaskok.jpeg" style="width: 150px; height: 150px; border-radius: 10px; object-fit: cover;"></div>
+                    <p class="text-xs text-gray-400 mt-2">(Klik suratnya yahh!!)</p>
+                </div>
+            </figure>
+
+            <div class="card-body items-center text-center">
+                <h2 id="card-title" class="card-title text-2xl font-bold text-pink-600"></h2>
+                <p id="card-text" class="text-gray-600 min-h-[50px]"></p>
+                
+                <div class="card-actions mt-6 w-full justify-between" id="nav-buttons">
+                    <button onclick="prevStep()" class="btn btn-circle btn-outline btn-secondary">❮</button>
+                    <div class="flex space-x-1 items-center">
+                        <span id="step-count" class="badge badge-ghost">1/4</span>
+                    </div>
+                    <button onclick="nextStep()" class="btn btn-circle btn-primary text-white shadow-lg shadow-pink-300/50">❯</button>
+                </div>
+
+                <div id="final-buttons" class="hidden flex-col gap-3 w-full mt-4">
+                    <button onclick="terimaCinta()" class="btn btn-primary w-full shadow-lg text-lg animate__animated animate__pulse animate__infinite">Mau banget! 😍</button>
+                    <button id="btn-tolak" onmouseover="hindar()" onclick="tolakCinta()" class="btn btn-outline btn-error w-full">Gak dulu deh...</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <dialog id="modal_surat" class="modal modal-bottom sm:modal-middle">
+        <div class="modal-box bg-[#fffdf0] border-2 border-pink-200 relative flex flex-col max-h-[85vh] p-0 overflow-hidden">
+            
+            <div class="absolute -top-4 -left-4 w-16 h-16 bg-pink-200 rounded-full opacity-50 pointer-events-none"></div>
+            <div class="absolute top-10 -right-4 w-10 h-10 bg-yellow-200 rounded-full opacity-50 pointer-events-none"></div>
+
+            <div class="pt-6 pb-2 px-6 flex-none z-10 bg-[#fffdf0]">
+                <h3 class="font-bold text-2xl text-pink-600 text-center border-b-2 border-dashed border-pink-300 pb-2">Pesan Rahasia 💌</h3>
+            </div>
+
+            <div class="flex-1 overflow-y-auto px-6 custom-scroll" id="scroll-container">
+                <div id="isi-surat" class="py-2 handwriting text-lg sm:text-xl leading-relaxed text-gray-700 typing-cursor text-justify"></div>
+            </div>
+
+            <div class="modal-action flex-none px-6 pb-6 pt-2 bg-[#fffdf0]">
+                <form method="dialog" class="w-full">
+                    <button class="btn btn-primary w-full text-white shadow-md">Tutup & Lanjut 🥺</button>
+                </form>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
+
+    <script>
+        const contents = [
+            {
+                title: "Allooo Keylaaa! 👋",
+                text: "Ada yang mau aku omongin nih sama kamu... \n Geser dulu yaa >>",
+                img: "gif/aloo.gif", 
+                isEnvelope: false
+            },
+            {
+                title: "Ini Penting Banget",
+                text: "Sebenernyaa akuu mau lakuin ini pas senin kemarin, pas akuu minta maap & ngasih fresh flower. Tapi kamu buru² banget, yaudahh dehh aku tunda",
+                img: "gif/aloo.gif",
+                isEnvelope: false
+            },
+            {
+                title: "Buka Suratnya yaa",
+                text: "Baca & scroll sampee habis suratnyaa yahh keylaaa",
+                img: "",
+                isEnvelope: true
+            },
+            {
+                title: "let's be more serious",
+                text: "Mungkin inii udah saatnyaa buatt lakuin inii. Akuu pengen kitaa bisaa saling jagaa, dan sama² teruss sepertii saat ini, atau bahkan lebih. Akuu pengenn kitaa lebih darii sebatas temen dekett, and menjalin hubungan. Ayoo kita jalanii bareng-bareng!\nMau???",
+                img: "gif/tempaskek.gif",
+                isEnvelope: false
+            }
+        ];
+
+        const suratContent = `Hai Keylaaa...<br><br>
+        Akuu mauu ngomongin hal pentingg nihhh samaa kamuuu. Kamuu tuhh orangnyaa spesiall banget buat akuuu, jujurr akuu masih gaa expect bisaa kenal and dekett samaa cewee yang cantikk & baikk kaya kamuu.
+        Aku jugaa masihh gaa expect kaloo sebernyaa kamu udah naksir duluann sama akuu. Pas kamuuu bilangg ke akuu kaloo kamu naksir duluann jugaa akuu kaget & seneng. <br><br> Aku sukaa banget liatt senyuman kamuu, liatt wajahh lucu kamuu, tingkah lakuu kamuu.
+        And akuu salutt kamu selaluu sabar ngadepin akuu yang emosinyaaa gampangg berubah, gapernahh gengsii buat mintaa maapp ke akuuu. Kadangg akuu jugaa nyesel kaloo abis marahh ke kamuu.<br><br>Jujurr, lama-lama rasaa suka akuu ke kamuuu jugaa makin bertambahh, makin cintaa samaa kamuu.
+        Akuu juga paham kaloo kamu udahh ngode² ke akuu nungguu kepastiann. Tapii akuu jugaa masih nungguu² waktuu yang tepat, karenaa akuu pengenn hubungan yangg bener² seriusss. Mungkinn gaa banyakkk yangg bisaa aku ungkapin, karenaa akuu rasa kitaa jugaa udahh sama² seriuss, dann udahh samaa² suka.
+
+        <br>Tutup dulu suratnya ya! trus klik next!`;
+
+        const myWhatsapp = "6281916604622"; 
+
+        let currentIndex = 0;
+        let isSuratOpened = false; 
+        const loading = document.getElementById('loading');
+        const mainContainer = document.getElementById('main-container');
+        const cardImage = document.getElementById('card-image');
+        const envelopeUI = document.getElementById('envelope-ui');
+
+        window.onload = () => {
+            setTimeout(() => {
+                loading.classList.add('hidden');
+                mainContainer.classList.remove('hidden');
+                mainContainer.classList.add('fade-in');
+                updateUI();
+            }, 5000);
+        };
+
+        function updateUI() {
+            const data = contents[currentIndex];
+            document.getElementById('card-title').innerText = data.title;
+            document.getElementById('card-text').innerText = data.text;
+            document.getElementById('step-count').innerText = `${currentIndex + 1}/${contents.length}`;
+
+            if (data.isEnvelope) {
+                cardImage.classList.add('hidden');
+                envelopeUI.classList.remove('hidden');
+                envelopeUI.classList.add('flex');
+            } else {
+                envelopeUI.classList.add('hidden');
+                envelopeUI.classList.remove('flex');
+                cardImage.classList.remove('hidden');
+                if(data.img) cardImage.src = data.img;
+            }
+
+            const navBtn = document.getElementById('nav-buttons');
+            const finalBtn = document.getElementById('final-buttons');
+            
+            if (currentIndex === contents.length - 1) {
+                navBtn.classList.add('hidden');
+                finalBtn.classList.remove('hidden');
+                finalBtn.classList.add('flex');
+            } else {
+                navBtn.classList.remove('hidden');
+                finalBtn.classList.add('hidden');
+                finalBtn.classList.remove('flex');
+            }
+        }
+
+        function typeWriter(text, elementId, speed = 40) {
+            let i = 0;
+            const container = document.getElementById(elementId);
+            const scrollContainer = document.getElementById('scroll-container'); // Ambil elemen wrapper scroll
+            container.innerHTML = ""; 
+            
+            function type() {
+                if (i < text.length) {
+                    if (text.charAt(i) === '<') {
+                        let tagEnd = text.indexOf('>', i);
+                        container.innerHTML += text.substring(i, tagEnd + 1);
+                        i = tagEnd + 1;
+                    } else {
+                        container.innerHTML += text.charAt(i);
+                        i++;
+                    }
+                    
+                    // Auto scroll ke bawah pelan-pelan saat ngetik (opsional)
+                    // scrollContainer.scrollTop = scrollContainer.scrollHeight; 
+                    
+                    setTimeout(type, speed); 
+                } else {
+                    container.classList.remove('typing-cursor');
+                }
+            }
+            type();
+        }
+
+        function bukaSurat() {
+            const modal = document.getElementById('modal_surat');
+            modal.showModal();
+            
+            if (!isSuratOpened) {
+                typeWriter(suratContent, "isi-surat", 40); 
+                isSuratOpened = true;
+            }
+        }
+
+        function nextStep() {
+            if (currentIndex < contents.length - 1) {
+                currentIndex++;
+                updateUI();
+            }
+        }
+
+        function prevStep() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateUI();
+            }
+        }
+
+        function terimaCinta() {
+            const text = "Hai! Aku udah baca suratnya dan...";
+            window.location.href = `https://wa.me/${myWhatsapp}?text=${encodeURIComponent(text)}`;
+        }
+
+        function hindar() {
+            const btn = document.getElementById('btn-tolak');
+            const x = Math.random() * (window.innerWidth - 200);
+            const y = Math.random() * (window.innerHeight - 200);
+            btn.style.position = 'fixed'; 
+            btn.style.left = `${x}px`;
+            btn.style.top = `${y}px`;
+        }
+
+        function tolakCinta() {
+            alert("Tombolnya licin banget ya? Coba yang satu lagi deh 😜");
+        }
+    </script>
+</body>
+</html>
